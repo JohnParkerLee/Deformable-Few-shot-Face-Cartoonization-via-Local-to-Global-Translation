@@ -1,0 +1,6 @@
+@inproceedings{zhou2023Deformable_few_shot_face_cartoonization,
+  title={Deformable Few-shot Face Cartoonization via Local to Global Translation},
+  author={Yang, Zhou and Shengshu, Li and Hui, Huang},
+  booktitle={Conference},
+  year={20XX}
+}
