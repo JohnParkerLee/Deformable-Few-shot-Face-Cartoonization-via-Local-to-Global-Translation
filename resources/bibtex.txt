@@ -1,6 +1,10 @@
-@inproceedings{zhou2023Deformable_few_shot_face_cartoonization,
-  title={Deformable Few-shot Face Cartoonization via Local to Global Translation},
-  author={Yang, Zhou and Shengshu, Li and Hui, Huang},
-  booktitle={Conference},
-  year={20XX}
-}
+@ARTICLE{10903675,
+  author={Zhou, Yang and Li, Shengshu and Huang, Hui},
+  journal={Computational Visual Media}, 
+  title={Deformable Few-Shot Face Cartoonization via Local to Global Translation}, 
+  year={2025},
+  volume={11},
+  number={2},
+  pages={269-287},
+  keywords={Translation;Faces;Generative adversarial networks;Deformation;Shape;Feature extraction;Visualization;Neural style transfer;Generators;Adaptation models;face stylization;cartoonization;few-shot learning;domain adaptation},
+  doi={10.26599/CVM.2025.9450348}}
