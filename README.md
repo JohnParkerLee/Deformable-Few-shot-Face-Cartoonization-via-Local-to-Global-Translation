@@ -1,6 +1,8 @@
 ## Deformable-Few-shot-Face-Cartoonization-via-Local-to-Global-Translation
 Deformable Few-shot Face Cartoonization via Local to Global Translation
 
+**The code is still being optimized**
+
 
 - [Deformable-Few-shot-Face-Cartoonization-via-Local-to-Global-Translation](#deformable-few-shot-face-cartoonization-via-local-to-global-translation)
   - [Requirements](#requirements)
@@ -9,6 +11,20 @@ Deformable Few-shot Face Cartoonization via Local to Global Translation
     - [2. Data preprocss](#2-data-preprocss)
     - [3. Network Training](#3-network-training)
     - [4. Network Testing](#4-network-testing)
+  - [Stage I, Landmark Prediction](#stage-i-landmark-prediction)
+    - [1. Data preprocess](#1-data-preprocess)
+    - [2. Data augmentation](#2-data-augmentation)
+    - [3. Network Training](#3-network-training-1)
+      - [Training](#training)
+      - [Finetuning for new style](#finetuning-for-new-style)
+    - [4. Pre-trained models](#4-pre-trained-models)
+      - [~~Inference for visulization~~](#inference-for-visulization)
+  - [Stage I, Intermediate Result](#stage-i-intermediate-result)
+  - [Stage II, Global Refinement](#stage-ii-global-refinement)
+    - [1. Training Process](#1-training-process)
+    - [2. pre-trained global refinement network](#2-pre-trained-global-refinement-network)
+    - [3. pre-trained psp models](#3-pre-trained-psp-models)
+    - [4. pre-trained fine-tuned models](#4-pre-trained-fine-tuned-models)
 
 
 ### Requirements
@@ -133,3 +149,185 @@ Test scripts
 ```shell
 python test.py --dataroot ./path/to/data/root --name <project_name> --model wocat_unpair_ori_cycle_gan --netG cyclegan --netD m_dis --init_type xavier --direction AtoB --dataset_mode testconsistency --norm instance --gpu_ids 1 --batch_size 1 --preprocess none --ngf 64 --num_threads 2 --no_flip --no_dropout --input_nc 3 --output_nc 3 --component <eyer/nose/mouth>
 ```
+
+
+
+### Stage I, Landmark Prediction
+
+#### 1. Data preprocess
+
+Randomly select 100 images from the training dataset and use the landmarks detected by [face-of-art](https://faculty.runi.ac.il/arik/site/foa/face-of-art.asp) as training data for landmark prediction. Remeber to convert `.txt` to `.json`.
+
+#### 2. Data augmentation
+
+Use `alignment_script\data_process.py` to augment the landmarks.
+
+```shell
+python data_process.py --mode augmentation --data_path
+/path/to/landmark_68-points_json --save_path /path/to/save
+```
+
+#### 3. Network Training
+
+The network directory is called `BicycleGAN`.
+
+##### Training
+
+Training scripts for 5 points
+
+```shell
+python train_back.py --dataroot /path/to/data/root --style_data_paths path/to/augmentation/json/path --content_data_paths path/to/landmark_68-points_json --dataset_mode final --load_size 512 --k 2 --model orilandmark_gan --netG landmarknet --lambda_GAN 0.0 --input_nc 10 --output_nc  10 --lambda_L1 100 --gpu_ids 0 --batch_size 16 --triplet 80 --fea_L1 0
+ --num_threads 12 --norm none --name 5_points_trian --display_freq 10 --niter 500 --niter_decay 300 --phase train --validate_freq 100 --part_class points_5 --init_type normal
+```
+
+Training scripts for 17 points
+
+```shell
+python train_back.py --dataroot /path/to/data/root --style_data_paths path/to/augmentation/json/path --content_data_paths path/to/landmark_68-points_json --dataset_mode final --load_size 512 --k 2 --model orilandmark_gan --netG landmarknet --lambda_GAN 0.0 --input_nc 34 --output_nc  34 --lambda_L1 100 --gpu_ids 0 --batch_size 16 --triplet 80 --fea_L1 0
+ --num_threads 12 --norm none --name 17_points_train --display_freq 10 --niter 800 --niter_decay 600 --phase train --validate_freq 100 --part_class head --init_type normal
+```
+
+##### Finetuning for new style
+
+Finetune scripts for 5-point landmarks
+
+```shell
+python train_back.py --dataroot /path/to/data/root --style_data_paths path/to/style/path --content_data_paths path/to/landmark_68-points_json --dataset_mode finetune --load_size 512 --k 2 --model orilandmark_gan --netG landmarknet --lambda_GAN 0.0 --input_nc 10 --output_nc  10 --lambda_L1 100 --gpu_ids 0 --batch_size 16 --triplet 60 --fea_L1 0
+ --num_threads 12 --norm none --name 5_points_finetune --display_freq 10 --niter 800 --niter_decay 200 --phase train --validate_freq 100 --part_class points_5 --continue --init_type normal --epoch 800 --epoch_count 801 --lr 0.00002 --finetune True
+```
+
+Finetune scripts for 17-point landmark
+
+```shell
+python train_back.py --dataroot /path/to/data/root --style_data_paths path/to/style/path --content_data_paths path/to/landmark_68-points_json --dataset_mode finetune --load_size 512 --k 2 --model orilandmark_gan --netG landmarknet --lambda_GAN 0.0 --input_nc 10 --output_nc  10 --lambda_L1 100 --gpu_ids 0 --batch_size 16 --triplet 60 --fea_L1 0
+ --num_threads 12 --norm none --name 17_points_finetune --display_freq 10 --niter 1400 --niter_decay 400 --phase train --validate_freq 100 --part_class head --continue --init_type normal --epoch 1400 --epoch_count 1401 --lr 0.00002 --finetune True
+```
+
+#### 4. Pre-trained models
+
+The pre-trained models with 5 points and 17 points, as well as the models fine-tuned on the Amedeo style. [link](https://drive.google.com/drive/folders/1cdHJg4eqB7_EkHYDpF46_--e5EZZB2Ob?usp=sharing)
+
+
+##### ~~Inference for visulization~~
+
+Inference for 5 points
+
+```shell
+python test.py --dataroot /path/to/data/root --style_data_paths path/to/style/path --content_data_paths path/to/landmark_68-points_json --results_dir path/to/save --dataset_mode final_test --phase test --num_test 100 --k 10 --input_nc 10 --output_nc 10 --gpu_ids 0 --model orilandmark_gan --netG landmarknet --name 5_points_finetune --load_size 512 --crop_size 512 --eval --norm none --part_class points_5 --epoch 1000
+```
+
+Inference for 17 points
+
+```shell
+python test.py --dataroot /path/to/data/root --style_data_paths path/to/style/path --content_data_paths path/to/landmark_68-points_json --results_dir path/to/save --dataset_mode final_test --phase test --num_test 100 --k 10 --input_nc 34 --output_nc 34 --gpu_ids 0 --model orilandmark_gan --netG landmarknet --name 17_points_finetune --load_size 512 --crop_size 512 --eval --norm none --part_class head --epoch 1800
+```
+
+### Stage I, Intermediate Result
+
+Navigate to the `cyclegan` directory and run the following script to obtain `intermediate results`, if you need landmark prediction:
+
+```shell
+python test.py --dataroot /path/to/data/root --name <project_name> --model combine --netG cyclegan --netD m_dis --init_type xavier --direction AtoB --dataset_mode combine --norm instance --gpu_ids 0 --batch_size 1 --preprocess none --ngf 64 --num_threads 2 --no_flip --no_dropout --input_nc 3 --output_nc 3 --num_test 1500 --pretrain_G_content_5 /path/to/landmark_prediction_network/checkpoints/5_points_finetune/1000_net_G_content.pth --pretrain_G_style_5 /path/to/landmark_prediction_network/checkpoints/5_points_finetune/1000_net_G_style.pth --pretrain_G_content_17 /path/to/landmark_prediction_network/checkpoints/17_points_finetune/1800_net_G_content.pth --pretrain_G_style_17 /path/to/landmark_prediction_network/checkpoints/17_points_finetune/1800_net_G_style.pth
+--need_landmark_predict
+```
+
+If you don't need landmark prediction, use the following script:
+
+```shell
+python test.py --dataroot /path/to/data/root --name <project_name> --model combine --netG cyclegan --netD m_dis --init_type xavier --direction AtoB --dataset_mode combine --norm instance --gpu_ids 0 --batch_size 1 --preprocess none --ngf 64 --num_threads 2 --no_flip --no_dropout --input_nc 3 --output_nc 3 --num_test 1500
+```
+
+### Stage II, Global Refinement
+
+#### 1. Training Process
+
+1. Prepare the data and StyleGAN2 checkpoint according to the [GAN adaptation](https://github.com/utkarshojha/few-shot-gan-adaptation) instructions.
+
+2. Assign the local component network checkpoint path as an argument.
+
+3. Train the `Global Refinement Network`
+
+   ```shell
+   CUDA_VISIBLE_DEVICES=0 python train_dis2.py --batch 3 --ckpt ./models/source_ffhq.pt --data_path ./processed_data/<dataset>/ --exp <project_name> --n_train 10 --iter 2002 --img_freq 200 --save_freq 1000 --size 256 --feat_const_batch 6 --subspace_freq 2
+   --cos_wt 1.0 --center_wt 125
+   --ckpt_netG_eye /path/to/local/eyer/checkpoint --ckpt_netG_nose /path/to/local/nose/checkpoint --ckpt_netG_mouth /path/to/local/mouth/checkpoint
+   ```
+
+   Or you can do not assign the local component network checkpoint path:
+
+   ```shell
+   CUDA_VISIBLE_DEVICES=0 python train.py --batch 3 --ckpt ./models/source_ffhq.pt --data_path ./processed_data/<dataset>/ --exp <project_name> --n_train 10 --iter 2002 --img_freq 200 --save_freq 1000 --size 256 --feat_const_batch 6 --subspace_freq 6 --cos_wt 1.0 --center_wt 125
+   ```
+
+   After training, use the Global Refinement Network to generate 10,000 images for training GAN inversion.
+
+   ```shell
+   CUDA_VISIBLE_DEVICES=0 python generate.py --ckpt_target /path/to/model/ --n_sample 10000
+   ```
+
+4. Train the [PSP network](https://github.com/eladrich/pixel2style2pixel) using the `source_ffhq` as the StyleGAN checkpoint.
+
+5. Finetune again(use jojoGAN)
+
+   In directory `jojogan`
+
+   Put the `Intermediate Result` to `res\<style>_res/res`. Copy the `feat5` and `checkpoints` directories from the local component network to the current working directory, so that you can use the extracted landmarks and trained model checkpoints for finetuning. Copy the `checkpoints` directory from the trained PSP models to the current working directory. 
+
+   **File tree**
+
+   ```python
+   ./bw_res # Intermediate image
+   	<style>_res
+       	res
+   ./trainB_<style> #style image
+   ./feat5 # 5 points landmark
+   	trainB_<style>
+   ./<style>_pg_dis.pt # psp checkpoints
+   ./<style>_combine # local component networks checkpoints
+   ```
+
+   Change the corresponding path in `predict.py`
+
+   ```shell
+   CUDA_VISIBLE_DEVICES=0 python predict.py
+   ```
+
+6. inference
+
+   Assign the related path in `inference_fine_tune.py` and run the following scripts:
+
+   ```shell
+   CUDA_VISIBLE_DEVICES=0 python inference_fine_tune.py
+   ```
+
+
+
+
+#### 2. pre-trained global refinement network
+
+|                            model                             |
+| :----------------------------------------------------------: |
+| [sketches](https://drive.google.com/drive/folders/1WMsEPtKy4G0zYLC8JCHO4i-pc6OFwI22?usp=sharing) |
+| [Amedeo](https://drive.google.com/drive/folders/1aaZKjqs-WcwcWbW-PuA1bYQHDgyl4SNM?usp=sharing) |
+| [minivision](https://drive.google.com/drive/folders/1R3NLmpLoQAGsBVRTc6BVdSqEj9Uue_AI?usp=sharing) |
+
+
+
+#### 3. pre-trained psp models
+
+|                            models                            |
+| :----------------------------------------------------------: |
+| [ffhq-to-ffhq](https://drive.google.com/file/d/1_2M8zJ2YivKRAHlDoh_e7jt1YSk5YibD/view?usp=sharing) |
+| [sketches-to-sketches](https://drive.google.com/file/d/1mtYSBvlw7APBr_CKm0KYHkN1qp3rMd08/view?usp=sharing) |
+| [Amedeo-to-Amedeo](https://drive.google.com/file/d/1BmjQO3Rt4UD1zRMyO7jBcAQ2cea9-3hB/view?usp=sharing) |
+| [minivision-to-minivision](https://drive.google.com/file/d/1a7rutODHeoQXbqYPCBmFU9h8C-ndseUg/view?usp=sharing) |
+
+
+
+#### 4. pre-trained fine-tuned models
+
+|                            model                             |
+| :----------------------------------------------------------: |
+| [sketches](https://drive.google.com/file/d/1VAgOVyJ1NSY1kiNocWLj3TPfgesEMK7P/view?usp=sharing) |
+| [Amedeo](https://drive.google.com/file/d/1zQfFc1Xm2Z928UGUylGbiTzuTEx8B2mu/view?usp=sharing) |
+| [minivision](https://drive.google.com/file/d/1gavA4JuAFwDve3w1NtgvRwHKr78wkklH/view?usp=sharing) |
