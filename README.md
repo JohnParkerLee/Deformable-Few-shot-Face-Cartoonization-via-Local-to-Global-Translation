@@ -1,6 +1,16 @@
 ## Deformable-Few-shot-Face-Cartoonization-via-Local-to-Global-Translation
 Deformable Few-shot Face Cartoonization via Local to Global Translation
 
+
+- [Deformable-Few-shot-Face-Cartoonization-via-Local-to-Global-Translation](#deformable-few-shot-face-cartoonization-via-local-to-global-translation)
+  - [Requirements](#requirements)
+  - [Stage I, Local Component Translation](#stage-i-local-component-translation)
+    - [1. Dataset](#1-dataset)
+    - [2. Data preprocss](#2-data-preprocss)
+    - [3. Network Training](#3-network-training)
+    - [4. Network Testing](#4-network-testing)
+
+
 ### Requirements
 
 - python==3.7.13
@@ -99,3 +109,27 @@ Deformable Few-shot Face Cartoonization via Local to Global Translation
   --   -- /testA_img
 
   --   -- ···
+
+
+#### 3. Network Training
+
+Training scripts
+
+```shell
+python train_pair.py --tensorboard <tensorboard_name> --dataroot ./path/to/data/root --name <project_name> --model wocat_unpair_ori_cycle_gan --netG cyclegan --netD m_dis --init_type xavier --direction AtoB --dataset_mode unpairconsistency --norm instance --gpu_ids 0 --display_port 8103 --batch_size 5 --preprocess none --n_epochs 20 --n_epochs_decay 15 --ngf 64 --save_epoch_freq 5 --num_threads 4 --no_dropout --input_nc 3 --output_nc 3 --component <eyer/nose/mouth> --lambda_sw 5e-6 --lambda_rel 0.0 --lambda_contextual 0.0 --lambda_hedgan 0.0 --lambda_avg 100.0 --lambda_identity 0.1 --lambda_trunc 0.0 --crop_size 256 --dataset _<dataset_name>
+```
+#### 4. Network Testing
+
+The provided pre-trained local component translation models.
+
+|    Styles     |                            Models                            |
+| :-----------: | :----------------------------------------------------------: |
+| Minivision-ai | [minivision](https://drive.google.com/drive/folders/1RGsOJovz22k7yYLxt7uLCtrD6NC59Ef6?usp=sharing) |
+|   sketches    | [sketches](https://drive.google.com/drive/folders/1iAsLRLfvKVbl5-YSX1-ZUEOFSVubaxXz?usp=sharing) |
+|    Amedeo     | [Amedeo](https://drive.google.com/drive/folders/1TApf9MH4PQ6EGcfCa1H_kJA3PeJXRrH-?usp=sharing) |
+
+Test scripts
+
+```shell
+python test.py --dataroot ./path/to/data/root --name <project_name> --model wocat_unpair_ori_cycle_gan --netG cyclegan --netD m_dis --init_type xavier --direction AtoB --dataset_mode testconsistency --norm instance --gpu_ids 1 --batch_size 1 --preprocess none --ngf 64 --num_threads 2 --no_flip --no_dropout --input_nc 3 --output_nc 3 --component <eyer/nose/mouth>
+```
