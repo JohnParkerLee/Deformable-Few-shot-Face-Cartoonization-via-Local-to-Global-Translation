@@ -1,7 +1,7 @@
 ## Deformable-Few-shot-Face-Cartoonization-via-Local-to-Global-Translation
 Deformable Few-shot Face Cartoonization via Local to Global Translation
 
-**The code is still being optimized**
+**Code are still preparing**
 
 
 - [Deformable-Few-shot-Face-Cartoonization-via-Local-to-Global-Translation](#deformable-few-shot-face-cartoonization-via-local-to-global-translation)
@@ -267,32 +267,8 @@ python test.py --dataroot /path/to/data/root --name <project_name> --model combi
 
 4. Train the [PSP network](https://github.com/eladrich/pixel2style2pixel) using the `source_ffhq` as the StyleGAN checkpoint.
 
-5. Finetune again(use jojoGAN)
 
-   In directory `jojogan`
-
-   Put the `Intermediate Result` to `res\<style>_res/res`. Copy the `feat5` and `checkpoints` directories from the local component network to the current working directory, so that you can use the extracted landmarks and trained model checkpoints for finetuning. Copy the `checkpoints` directory from the trained PSP models to the current working directory. 
-
-   **File tree**
-
-   ```python
-   ./bw_res # Intermediate image
-   	<style>_res
-       	res
-   ./trainB_<style> #style image
-   ./feat5 # 5 points landmark
-   	trainB_<style>
-   ./<style>_pg_dis.pt # psp checkpoints
-   ./<style>_combine # local component networks checkpoints
-   ```
-
-   Change the corresponding path in `predict.py`
-
-   ```shell
-   CUDA_VISIBLE_DEVICES=0 python predict.py
-   ```
-
-6. inference
+5. inference
 
    Assign the related path in `inference_fine_tune.py` and run the following scripts:
 
