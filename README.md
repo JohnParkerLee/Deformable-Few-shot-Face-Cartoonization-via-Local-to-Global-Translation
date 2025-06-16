@@ -176,13 +176,13 @@ The network directory is called `LandmarkPrediction`.
 Training scripts for 5 points
 
 ```shell
-python train_back.py --dataroot /path/to/data/root --style_data_paths path/to/augmentation/json/path --content_data_paths path/to/landmark_68-points_json --dataset_mode final --load_size 512 --k 2 --model orilandmark_gan --netG landmarknet --lambda_GAN 0.0 --input_nc 10 --output_nc  10 --lambda_L1 100 --gpu_ids 0 --batch_size 16 --triplet 80 --num_threads 12 --norm none --name 5_points_trian --display_freq 10 --niter 500 --niter_decay 300 --phase train --validate_freq 100 --part_class points_5 --init_type normal
+python train.py --dataroot /path/to/data/root --style_data_paths path/to/augmentation/json/path --content_data_paths path/to/landmark_68-points_json --dataset_mode final --load_size 512 --k 2 --model landmark_gan --netG landmarknet --lambda_GAN 0.0 --input_nc 10 --output_nc  10 --lambda_L1 100 --gpu_ids 0 --batch_size 16 --triplet 80 --num_threads 12 --norm none --name 5_points_trian --display_freq 10 --niter 500 --niter_decay 300 --phase train --validate_freq 100 --part_class points_5 --init_type normal
 ```
 
 Training scripts for 17 points
 
 ```shell
-python train_back.py --dataroot /path/to/data/root --style_data_paths path/to/augmentation/json/path --content_data_paths path/to/landmark_68-points_json --dataset_mode final --load_size 512 --k 2 --model orilandmark_gan --netG landmarknet --lambda_GAN 0.0 --input_nc 34 --output_nc  34 --lambda_L1 100 --gpu_ids 0 --batch_size 16 --triplet 80 --num_threads 12 --norm none --name 17_points_train --display_freq 10 --niter 800 --niter_decay 600 --phase train --validate_freq 100 --part_class head --init_type normal
+python train.py --dataroot /path/to/data/root --style_data_paths path/to/augmentation/json/path --content_data_paths path/to/landmark_68-points_json --dataset_mode final --load_size 512 --k 2 --model landmark_gan --netG landmarknet --lambda_GAN 0.0 --input_nc 34 --output_nc  34 --lambda_L1 100 --gpu_ids 0 --batch_size 16 --triplet 80 --num_threads 12 --norm none --name 17_points_train --display_freq 10 --niter 800 --niter_decay 600 --phase train --validate_freq 100 --part_class head --init_type normal
 ```
 
 ##### Finetuning for new style
@@ -190,13 +190,13 @@ python train_back.py --dataroot /path/to/data/root --style_data_paths path/to/au
 Finetune scripts for 5-point landmarks
 
 ```shell
-python train_back.py --dataroot /path/to/data/root --style_data_paths path/to/style/path --content_data_paths path/to/landmark_68-points_json --dataset_mode finetune --load_size 512 --k 2 --model orilandmark_gan --netG landmarknet --lambda_GAN 0.0 --input_nc 10 --output_nc  10 --lambda_L1 100 --gpu_ids 0 --batch_size 16 --triplet 60 --num_threads 12 --norm none --name 5_points_finetune --display_freq 10 --niter 800 --niter_decay 200 --phase train --validate_freq 100 --part_class points_5 --continue --init_type normal --epoch 800 --epoch_count 801 --lr 0.00002 --finetune True
+python train.py --dataroot /path/to/data/root --style_data_paths path/to/style/path --content_data_paths path/to/landmark_68-points_json --dataset_mode finetune --load_size 512 --k 2 --model landmark_gan --netG landmarknet --lambda_GAN 0.0 --input_nc 10 --output_nc  10 --lambda_L1 100 --gpu_ids 0 --batch_size 16 --triplet 60 --num_threads 12 --norm none --name 5_points_finetune --display_freq 10 --niter 800 --niter_decay 200 --phase train --validate_freq 100 --part_class points_5 --continue --init_type normal --epoch 800 --epoch_count 801 --lr 0.00002 --finetune True
 ```
 
 Finetune scripts for 17-point landmark
 
 ```shell
-python train_back.py --dataroot /path/to/data/root --style_data_paths path/to/style/path --content_data_paths path/to/landmark_68-points_json --dataset_mode finetune --load_size 512 --k 2 --model orilandmark_gan --netG landmarknet --lambda_GAN 0.0 --input_nc 10 --output_nc  10 --lambda_L1 100 --gpu_ids 0 --batch_size 16 --triplet 60 --num_threads 12 --norm none --name 17_points_finetune --display_freq 10 --niter 1400 --niter_decay 400 --phase train --validate_freq 100 --part_class head --continue --init_type normal --epoch 1400 --epoch_count 1401 --lr 0.00002 --finetune True
+python train.py --dataroot /path/to/data/root --style_data_paths path/to/style/path --content_data_paths path/to/landmark_68-points_json --dataset_mode finetune --load_size 512 --k 2 --model landmark_gan --netG landmarknet --lambda_GAN 0.0 --input_nc 10 --output_nc  10 --lambda_L1 100 --gpu_ids 0 --batch_size 16 --triplet 60 --num_threads 12 --norm none --name 17_points_finetune --display_freq 10 --niter 1400 --niter_decay 400 --phase train --validate_freq 100 --part_class head --continue --init_type normal --epoch 1400 --epoch_count 1401 --lr 0.00002 --finetune True
 ```
 
 #### 4. Pre-trained models
@@ -209,13 +209,13 @@ The pre-trained models with 5 points and 17 points, as well as the models fine-t
 Inference for 5 points
 
 ```shell
-python test.py --dataroot /path/to/data/root --style_data_paths path/to/style/path --content_data_paths path/to/landmark_68-points_json --results_dir path/to/save --dataset_mode final_test --phase test --num_test 100 --k 10 --input_nc 10 --output_nc 10 --gpu_ids 0 --model orilandmark_gan --netG landmarknet --name 5_points_finetune --load_size 512 --crop_size 512 --eval --norm none --part_class points_5 --epoch 1000
+python test.py --dataroot /path/to/data/root --style_data_paths path/to/style/path --content_data_paths path/to/landmark_68-points_json --results_dir path/to/save --dataset_mode final_test --phase test --num_test 100 --k 10 --input_nc 10 --output_nc 10 --gpu_ids 0 --model landmark_gan --netG landmarknet --name 5_points_finetune --load_size 512 --crop_size 512 --eval --norm none --part_class points_5 --epoch 1000
 ```
 
 Inference for 17 points
 
 ```shell
-python test.py --dataroot /path/to/data/root --style_data_paths path/to/style/path --content_data_paths path/to/landmark_68-points_json --results_dir path/to/save --dataset_mode final_test --phase test --num_test 100 --k 10 --input_nc 34 --output_nc 34 --gpu_ids 0 --model orilandmark_gan --netG landmarknet --name 17_points_finetune --load_size 512 --crop_size 512 --eval --norm none --part_class head --epoch 1800
+python test.py --dataroot /path/to/data/root --style_data_paths path/to/style/path --content_data_paths path/to/landmark_68-points_json --results_dir path/to/save --dataset_mode final_test --phase test --num_test 100 --k 10 --input_nc 34 --output_nc 34 --gpu_ids 0 --model landmark_gan --netG landmarknet --name 17_points_finetune --load_size 512 --crop_size 512 --eval --norm none --part_class head --epoch 1800
 ```
 
 ### Stage I, Intermediate Result
