@@ -19,8 +19,10 @@ Deformable Few-shot Face Cartoonization via Local to Global Translation
       - [Finetuning for new style](#finetuning-for-new-style)
     - [4. Pre-trained models](#4-pre-trained-models)
       - [~~Inference for visulization~~](#inference-for-visulization)
-  - [Stage I, Intermediate Result](#stage-i-intermediate-result)
-  - [Stage II, Global Refinement](#stage-ii-global-refinement)
+  - [Stage II, LocalComponentNetwork](#stage-ii-localcomponentnetwork)
+    - [Train](#train)
+    - [Inference](#inference)
+  - [Stage III, Global Refinement](#stage-iii-global-refinement)
     - [1. Training Process](#1-training-process)
     - [2. pre-trained global refinement network](#2-pre-trained-global-refinement-network)
     - [3. pre-trained psp models](#3-pre-trained-psp-models)
@@ -218,7 +220,12 @@ Inference for 17 points
 python test.py --dataroot /path/to/data/root --style_data_paths path/to/style/path --content_data_paths path/to/landmark_68-points_json --results_dir path/to/save --dataset_mode final_test --phase test --num_test 100 --k 10 --input_nc 34 --output_nc 34 --gpu_ids 0 --model landmark_gan --netG landmarknet --name 17_points_finetune --load_size 512 --crop_size 512 --eval --norm none --part_class head --epoch 1800
 ```
 
-### Stage I, Intermediate Result
+### Stage II, LocalComponentNetwork
+
+#### Train
+
+
+#### Inference
 
 Navigate to the `cyclegan` directory and run the following script to obtain `intermediate results`, if you need landmark prediction:
 
@@ -233,7 +240,7 @@ If you don't need landmark prediction, use the following script:
 python test.py --dataroot /path/to/data/root --name <project_name> --model combine --netG cyclegan --netD m_dis --init_type xavier --direction AtoB --dataset_mode combine --norm instance --gpu_ids 0 --batch_size 1 --preprocess none --ngf 64 --num_threads 2 --no_flip --no_dropout --input_nc 3 --output_nc 3 --num_test 1500
 ```
 
-### Stage II, Global Refinement
+### Stage III, Global Refinement
 
 #### 1. Training Process
 
