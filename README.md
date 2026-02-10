@@ -20,7 +20,6 @@ Deformable Few-shot Face Cartoonization via Local to Global Translation
     - [4. Pre-trained models](#4-pre-trained-models)
       - [~~Inference for visulization~~](#inference-for-visulization)
   - [Stage II, LocalComponentNetwork](#stage-ii-localcomponentnetwork)
-    - [Train](#train)
     - [Inference](#inference)
   - [Stage III, Global Refinement](#stage-iii-global-refinement)
     - [1. Training Process](#1-training-process)
@@ -220,13 +219,9 @@ Inference for 17 points
 python test.py --dataroot /path/to/data/root --style_data_paths path/to/style/path --content_data_paths path/to/landmark_68-points_json --results_dir path/to/save --dataset_mode final_test --phase test --num_test 100 --k 10 --input_nc 34 --output_nc 34 --gpu_ids 0 --model landmark_gan --netG landmarknet --name 17_points_finetune --load_size 512 --crop_size 512 --eval --norm none --part_class head --epoch 1800
 ```
 
-### Stage II, LocalComponentNetwork
-
-#### Train
-
+### Stage I, Intermediate Result
 
 #### Inference
-
 Navigate to the `cyclegan` directory and run the following script to obtain `intermediate results`, if you need landmark prediction:
 
 ```shell
